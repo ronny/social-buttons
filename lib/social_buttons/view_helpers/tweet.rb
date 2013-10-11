@@ -2,7 +2,7 @@ module SocialButtons
   module Tweet
     include SocialButtons::Assistant
 
-    TWITTER_SHARE_URL = "http://twitter.com/share"
+    TWITTER_SHARE_URL = "//twitter.com/share"
     CLASS = "twitter-share-button"
 
     def tweet_button(options = {})
@@ -39,11 +39,9 @@ module SocialButtons
       def script
         return empty_content if widgetized? :tweet
         widgetized! :tweet
-        "<script src=#{twitter_wjs} type='text/javascript'></script>".html_safe
-      end
-
-      def twitter_wjs
-        "http://platform.twitter.com/widgets.js"
+        %Q{
+          <script async>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+        }.html_safe
       end
     end # class
   end

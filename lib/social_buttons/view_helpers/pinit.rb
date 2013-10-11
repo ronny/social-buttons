@@ -1,26 +1,31 @@
+require 'addressable/uri'
+
 module SocialButtons
   module Pinit
     include SocialButtons::Assistant
 
-    PINIT_CREATE_BUTTON = "http://pinterest.com/pin/create/button/"
-    PINIT_BUTTON_IMAGE  = "http://assets.pinterest.com/images/PinExt.png"
+    PINIT_CREATE_BUTTON = "//www.pinterest.com/pin/create/button/"
+    PINIT_BUTTON_IMAGE  = "//assets.pinterest.com/images/pidgets/pin_it_button.png"
     CLASS = "pin-it-button"
     TITLE = "Pin It"
 
     def pinit_button(options = {})
       clazz = SocialButtons::Pinit
       default_options = {url: request.url, media: request.url}
-      params = clazz.default_options.merge(clazz.default_options).merge(options)
+      params = clazz.default_options.merge(default_options).merge(options)
       params.merge!(:class => CLASS)
+      params_for_pin = params.slice(:url, :media, :description)
 
-      query_string  = clazz.options_to_query_string(self, params)
       option_params = params.except(:url, :media, :description)
-      pinit_link    = PINIT_CREATE_BUTTON + query_string
+      pinit_link    = Addressable::URI.parse(PINIT_CREATE_BUTTON).tap do |u|
+        u.query_values = params_for_pin
+      end.to_s
+      p pinit_link
 
-      html = "".html_safe
-      html << link_to(pinit_link, option_params) do
+      html = link_to(pinit_link, option_params) do
         image_tag PINIT_BUTTON_IMAGE, border: ("0" || options[:border]), title: (TITLE || options[:title])
       end
+      p html
       html << clazz::Scripter.new(self).script
       html
     end
@@ -29,15 +34,15 @@ module SocialButtons
       def default_options
         @default_options ||= {
           description: "Pin Me!"
-        }.merge("count-layout" => "none")
+        }
       end
     end
 
     class Scripter < SocialButtons::Scripter
       def script
         return empty_content if widgetized? :pinit
-        widgetized! :pinit        
-        "<script src=#{pinit_js} type='text/javascript'></script>".html_safe
+        widgetized! :pinit
+        "<script src=#{pinit_js} type='text/javascript' async></script>".html_safe
       end
 
       def pinit_js

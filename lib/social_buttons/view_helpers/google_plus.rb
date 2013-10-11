@@ -59,16 +59,14 @@ module SocialButtons
 
       def language lang = nil
         "window.___gcfg = {lang: '#{lang}'};" if lang
-      end     
+      end
     end
 
 
     class AsyncScripter < SocialButtons::Scripter
       # Place this tag in your head or just before your close body tag
       def script lang = nil
-        %Q{<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
-          #{language lang}
-        </script>}
+        %Q{<script type="text/javascript" src="https://apis.google.com/js/plusone.js" async>#{language lang}</script>}.html_safe
       end
 
       def language lang = nil
