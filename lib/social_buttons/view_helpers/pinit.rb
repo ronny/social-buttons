@@ -20,12 +20,10 @@ module SocialButtons
       pinit_link    = Addressable::URI.parse(PINIT_CREATE_BUTTON).tap do |u|
         u.query_values = params_for_pin
       end.to_s
-      p pinit_link
 
       html = link_to(pinit_link, option_params) do
         image_tag PINIT_BUTTON_IMAGE, border: ("0" || options[:border]), title: (TITLE || options[:title])
       end
-      p html
       html << clazz::Scripter.new(self).script
       html
     end
